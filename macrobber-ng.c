@@ -38,7 +38,7 @@ printStatx(const struct statx *sbx, const char *pathfile)
    __s32 fmode = sbx->stx_mode;
 	unsigned long flags = 0UL;
 
-   char hash[40] = "0"; // HARDCODED
+   char hash[40] = "0"; // Hardcoded hash to 0 by the moment 
    char *filetype;
    size_t bufsize = 255;
    ssize_t result;
@@ -50,7 +50,7 @@ printStatx(const struct statx *sbx, const char *pathfile)
          case S_IFDIR:  filetype = "d";                                 break;
          case S_IFCHR:  filetype = "c";                                 break;
          case S_IFBLK:  filetype = "b";                                 break;
-         case S_IFLNK:  filetype = "l";                                 break;    // FOLLOW LINK
+         case S_IFLNK:  filetype = "l";                                 break; 
          case S_IFIFO:  filetype = "p";                                 break;
          case S_IFSOCK: filetype = "s";                                 break;
          default: filetype = "-";                                       break;
@@ -104,15 +104,11 @@ void listdir(const char *name)
                continue;
          
          snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
-         //printf("%s\n", path);
          statx(AT_FDCWD , path, AT_SYMLINK_NOFOLLOW, STATX_ALL, &sbx);
          printStatx(&sbx, path);
          listdir(path);
       } else {
-         //if (entry->d_type == DT_LNK)
-         //   continue;
          snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
-         //printf("%s\n", path);
          statx(AT_FDCWD , path, AT_SYMLINK_NOFOLLOW, STATX_ALL, &sbx);
          printStatx(&sbx, path);
       }
@@ -132,16 +128,7 @@ void main(int argc, char *argv[])
             return 0;
    }
 
-
-	//ifError(statx(AT_FDCWD , argv[1], AT_SYMLINK_NOFOLLOW, STATX_ALL, 
-   //               &sbx) == -1, "Error en statx (%s)\n", argv[1] );
-
    listdir(argv[1]);
-
-   //mostrarInfodeStatx(&sbx, argv[1]);
-
-
-
 
 	exit(EXIT_SUCCESS);
 }
