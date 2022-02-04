@@ -24,21 +24,26 @@
 */
 
 #define _GNU_SOURCE
+#define VERSION "0.1"
+#define PATH_LEN	2048
+
 #include <sys/stat.h>
 #include <locale.h>
-#include <dirent.h> 
+#include <dirent.h>
+
+#include <unistd.h>
 
 #include "ifError.h"
 #include "utils.h"
 
 
 static void
-printStatx(const struct statx *sbx, const char *pathfile)
+printStatx(const struct statx *sbx, const char *pathfile, const int hashfiles)
 {
    __s32 fmode = sbx->stx_mode;
 	unsigned long flags = 0UL;
 
-   char hash[40] = "0"; // Hardcoded hash to 0 by the moment 
+   char *hash = "";
    char *filetype;
    size_t bufsize = 255;
    ssize_t result;
@@ -68,6 +73,20 @@ printStatx(const struct statx *sbx, const char *pathfile)
       strcat(linkedfile, buf);
    }
 
+
+   if ( sbx->stx_size == 0)  {
+      hash = "d41d8cd98f00b204e9800998ecf8427e";
+   }
+
+   if (( filetype == "d") || (hashfiles == 0)) {
+      hash = "0";
+   }
+
+   if ( (hashfiles == 1) && (filetype == "-") && (sbx->stx_size >= 0) ) {
+      calculate_md5sum(pathfile);
+   }
+
+
    printf("%s|%s|%llu|%s%s%s|%d|%d|%llu|%llu.%llu|%llu.%llu|%llu.%llu|%llu.%llu \n", hash,
                                                                                     pathfile,
                                                                                     (unsigned long long) sbx->stx_ino,
@@ -88,47 +107,78 @@ printStatx(const struct statx *sbx, const char *pathfile)
 
 }
 
-void listdir(const char *name)
+void listdir(const char *name, const int hashfiles)
 {
    DIR *dir;
    struct dirent *entry;
    struct statx sbx;
+   char path[PATH_LEN];
 
    if (!(dir = opendir(name)))
       return;
 
    while ((entry = readdir(dir)) != NULL) {
-      char path[1024];
       if (entry->d_type == DT_DIR) {
          if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
                continue;
          
          snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
          statx(AT_FDCWD , path, AT_SYMLINK_NOFOLLOW, STATX_ALL, &sbx);
-         printStatx(&sbx, path);
-         listdir(path);
+         printStatx(&sbx, path, hashfiles);
+         listdir(path, hashfiles);
       } else {
          snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
          statx(AT_FDCWD , path, AT_SYMLINK_NOFOLLOW, STATX_ALL, &sbx);
-         printStatx(&sbx, path);
+         printStatx(&sbx, path, hashfiles);
       }
    }
    closedir(dir);
 }
 
+static void usage(const char *argv0)
+{
+   printf("macrobber-ng v%s \n", VERSION);
+   printf("USAGE: %s <-5> [DIRECTORY] \n", argv0);
+   printf("\t -5 do MD5 calculation (disabled by default)\n");
+   exit(EXIT_FAILURE);
+}
+
 void main(int argc, char *argv[])
 {
+   int opt;
+   int hashfiles = 0;
+   char *processpath;
 
    setlocale(LC_ALL, "");
 
    // check to see if user entered a directory name */
-   if (argc < 2)
+   //if (argc < 2)
+   //{
+   //         printf("Usage: %s <directory>\n", argv[0]);
+   //         return 0;
+   //}
+
+   while ((opt = getopt(argc, argv, "5")) != -1)
    {
-            printf("Usage: %s <directory>\n", argv[0]);
-            return 0;
+      switch (opt)
+      {
+      case '5':
+         hashfiles = 1;
+         break;
+      default:
+         usage(argv[0]);
+      }
    }
 
-   listdir(argv[1]);
+   if (argc - optind < 1)
+   {
+      fprintf(stderr, "%s: too few arguments\n", argv[0]);
+      usage(argv[0]);
+   }
+
+   processpath = argv[optind++];
+   
+   listdir(processpath, hashfiles);
 
 	exit(EXIT_SUCCESS);
 }

@@ -4,6 +4,8 @@
 #include <time.h>
 
 #include "ifError.h"
+#include "md5.h"
+#include <stdio.h>
 
 const char *str_perm(unsigned int perm)
 {
@@ -21,4 +23,18 @@ const char *str_perm(unsigned int perm)
                            ((perm & S_ISVTX) ? 'T' : '-'));
 
     return strperm;
+}
+
+const char *calculate_md5sum(const char *filename)
+{
+    uint8_t *result;
+    FILE *in_file = fopen(filename, "r");
+
+    result = md5File(in_file);
+
+	for(unsigned int i = 0; i < 16; ++i){
+		printf("%02x", result[i]);
+	}
+	free(result);
+    fclose (in_file);
 }
