@@ -24,7 +24,7 @@
 */
 
 #define _GNU_SOURCE
-#define VERSION "0.1"
+#define VERSION "0.2.1"
 #define PATH_LEN	2048
 
 #include <sys/stat.h>
@@ -135,11 +135,13 @@ void listdir(const char *name, const int hashfiles)
    closedir(dir);
 }
 
-static void usage(const char *argv0)
+static void help(const char *argv0)
 {
    printf("macrobber-ng v%s \n", VERSION);
-   printf("USAGE: %s <-5> [DIRECTORY] \n", argv0);
+   printf("USAGE: %s <-5> <-v> <-h> [DIRECTORY] \n", argv0);
    printf("\t -5 do MD5 calculation (disabled by default)\n");
+   printf("\t -v Show version\n");
+   printf("\t -h This help\n");
    exit(EXIT_FAILURE);
 }
 
@@ -158,22 +160,29 @@ void main(int argc, char *argv[])
    //         return 0;
    //}
 
-   while ((opt = getopt(argc, argv, "5")) != -1)
+   while ((opt = getopt(argc, argv, "vh::5")) != -1)
    {
       switch (opt)
       {
       case '5':
          hashfiles = 1;
          break;
+      case 'v':
+         printf("macrobber-ng v%s \n", VERSION);
+         exit(EXIT_SUCCESS);
+      case 'h':
+         help(argv[0]);
+         break;
       default:
-         usage(argv[0]);
+         help(argv[0]);
       }
    }
+
 
    if (argc - optind < 1)
    {
       fprintf(stderr, "%s: too few arguments\n", argv[0]);
-      usage(argv[0]);
+      help(argv[0]);
    }
 
    processpath = argv[optind++];
