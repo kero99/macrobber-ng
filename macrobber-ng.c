@@ -105,6 +105,7 @@ printStatx(const struct statx *sbx, const char *pathfile, const int hashfiles)
                                                                                     sbx->stx_btime.tv_sec,
                                                                                     sbx->stx_btime.tv_nsec);
 
+   free(buf);
 }
 
 void listdir(const char *name, const int hashfiles)
