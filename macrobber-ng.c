@@ -24,7 +24,7 @@
 */
 
 #define _GNU_SOURCE
-#define VERSION "0.2.1"
+#define VERSION "0.2.2"
 #define PATH_LEN	2048
 
 #include <sys/stat.h>
