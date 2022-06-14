@@ -10,7 +10,7 @@ make install
 
 ### USE ###
 
-mactime-ng /path/to/process > fs.body
+macrobber-ng /path/to/process > fs.body
 
 ### NOTES ###
 
