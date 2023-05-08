@@ -11,5 +11,6 @@
 
 const char *str_perm(unsigned int perm);
 const char *calculate_md5sum(const char *filename);
+const char *calculate_sha1sum(const char *filename);
 
 #endif

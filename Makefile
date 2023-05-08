@@ -1,6 +1,6 @@
 EXE := macrobber-ng
 CFLAGS := -O2 -Wall -g
-LDLIBS := -lacl -lcap -lcrypto -lssl 
+LDLIBS := -lacl -lcrypto -lssl 
 DESTDIR := /usr/local
 SRC := $(wildcard *.c)
 OBJ := $(SRC:.c=.o)

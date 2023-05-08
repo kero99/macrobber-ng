@@ -5,6 +5,7 @@
 
 #include "ifError.h"
 #include "md5.h"
+#include "sha1.h"
 #include <stdio.h>
 
 const char *str_perm(unsigned int perm)
@@ -36,5 +37,19 @@ const char *calculate_md5sum(const char *filename)
 		printf("%02x", result[i]);
 	}
 	free(result);
+    fclose (in_file);
+}
+
+const char *calculate_sha1sum(const char *filename)
+{
+    uint8_t *result;
+    FILE *in_file = fopen(filename, "r");
+
+    result = sha1File(in_file);
+
+    for(unsigned int i = 0; i < 20; ++i){
+        printf("%02x", result[i]);
+    }
+    free(result);
     fclose (in_file);
 }

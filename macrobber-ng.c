@@ -24,7 +24,7 @@
 */
 
 #define _GNU_SOURCE
-#define VERSION "0.2.2"
+#define VERSION "0.3"
 #define PATH_LEN	2048
 
 #include <sys/stat.h>
@@ -37,8 +37,9 @@
 #include "utils.h"
 
 
+
 static void
-printStatx(const struct statx *sbx, const char *pathfile, const int hashfiles)
+printStatx(const struct statx *sbx, const char *pathfile, const char *hashfiles)
 {
    __s32 fmode = sbx->stx_mode;
 	unsigned long flags = 0UL;
@@ -73,7 +74,6 @@ printStatx(const struct statx *sbx, const char *pathfile, const int hashfiles)
       strcat(linkedfile, buf);
    }
 
-
    if ( sbx->stx_size == 0)  {
       hash = "d41d8cd98f00b204e9800998ecf8427e";
    }
@@ -82,8 +82,14 @@ printStatx(const struct statx *sbx, const char *pathfile, const int hashfiles)
       hash = "0";
    }
 
-   if ( (hashfiles == 1) && (filetype == "-") && (sbx->stx_size >= 0) ) {
+   if ( (hashfiles == "md5") && (filetype == "-") && (sbx->stx_size >= 0) ) {
       calculate_md5sum(pathfile);
+   }
+
+   if ( (hashfiles == "sha1") && (filetype == "-") && (sbx->stx_size >= 0) ) {
+      
+      calculate_sha1sum(pathfile);
+      //printf("DEBUG");
    }
 
 
@@ -108,7 +114,7 @@ printStatx(const struct statx *sbx, const char *pathfile, const int hashfiles)
    free(buf);
 }
 
-void listdir(const char *name, const int hashfiles)
+void listdir(const char *name, const char *hashfiles)
 {
    DIR *dir;
    struct dirent *entry;
@@ -139,8 +145,9 @@ void listdir(const char *name, const int hashfiles)
 static void help(const char *argv0)
 {
    printf("macrobber-ng v%s \n", VERSION);
-   printf("USAGE: %s <-5> <-v> <-h> [DIRECTORY] \n", argv0);
+   printf("USAGE: %s <-5> <-s> <-v> <-h> [DIRECTORY] \n", argv0);
    printf("\t -5 do MD5 calculation (disabled by default)\n");
+   printf("\t -s do SHA1 calculation (disabled by default)\n");
    printf("\t -v Show version\n");
    printf("\t -h This help\n");
    exit(EXIT_FAILURE);
@@ -149,7 +156,8 @@ static void help(const char *argv0)
 void main(int argc, char *argv[])
 {
    int opt;
-   int hashfiles = 0;
+   //init hashfiles as emprty string
+   char *hashfiles = "";
    char *processpath;
 
    setlocale(LC_ALL, "");
@@ -161,12 +169,15 @@ void main(int argc, char *argv[])
    //         return 0;
    //}
 
-   while ((opt = getopt(argc, argv, "vh::5")) != -1)
+   while ((opt = getopt(argc, argv, "vh::5s")) != -1)
    {
       switch (opt)
       {
       case '5':
-         hashfiles = 1;
+         hashfiles = "md5";
+         break;
+      case 's':
+         hashfiles = "sha1";
          break;
       case 'v':
          printf("macrobber-ng v%s \n", VERSION);
