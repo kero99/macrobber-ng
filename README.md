@@ -5,12 +5,24 @@ This program uses system calls and therefore will modify the A-Time on directori
 This program is based on the work of Author: Brian Carrier [carrier@sleuthkit.org] but upgraded to support btime/crtime and improve performance over python versions.
 
 ### COMPILE ###
+```
 make
 make install
-
+```
 ### USE ###
-
+```
+macrobber-ng v0.4
+USAGE: macrobber-ng <-5> <-s> <-v> <-h> [DIRECTORY]
+         -5 do MD5 calculation (disabled by default)
+         -s do SHA1 calculation (disabled by default)
+         -S do SHA256 calculation (disabled by default)
+         -v Show version
+         -h This help
+```
+Example:
+```
 macrobber-ng /path/to/process > fs.body
+```
 
 ### NOTES ###
 
