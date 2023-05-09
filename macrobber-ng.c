@@ -74,26 +74,36 @@ printStatx(const struct statx *sbx, const char *pathfile, const char *hashfiles)
       strcat(linkedfile, buf);
    }
 
-   if ( sbx->stx_size == 0)  {
-      hash = "d41d8cd98f00b204e9800998ecf8427e";
-   }
 
    if (( filetype == "d") || (hashfiles == 0)) {
       hash = "0";
    }
 
-   if ( (hashfiles == "md5") && (filetype == "-") && (sbx->stx_size >= 0) ) {
-      calculate_md5sum(pathfile);
+   if ( (hashfiles == "md5") && (filetype == "-")) {
+      if ( sbx->stx_size == 0)  {
+          hash = "d41d8cd98f00b204e9800998ecf8427e";
+      } 
+      else {
+         calculate_md5sum(pathfile);
+      }
    }
 
-   if ( (hashfiles == "sha1") && (filetype == "-") && (sbx->stx_size >= 0) ) {
-      
-      calculate_sha1sum(pathfile);
+   if ( (hashfiles == "sha1") && (filetype == "-")) {
+      if ( sbx->stx_size == 0)  {
+          hash = "da39a3ee5e6b4b0d3255bfef95601890afd80709";
+      } 
+      else {
+         calculate_sha1sum(pathfile);
+      }
    }
 
-   if ( (hashfiles == "sha256") && (filetype == "-") && (sbx->stx_size >= 0) ) {
-      
-      calculate_sha256sum(pathfile);
+   if ( (hashfiles == "sha256") && (filetype == "-")) {
+      if ( sbx->stx_size == 0)  {
+          hash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+      } 
+      else {
+         calculate_sha256sum(pathfile);
+      }
    }
 
    printf("%s|%s|%llu|%s%s%s|%d|%d|%llu|%llu.%llu|%llu.%llu|%llu.%llu|%llu.%llu \n", hash,
