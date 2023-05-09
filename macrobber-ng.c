@@ -24,7 +24,7 @@
 */
 
 #define _GNU_SOURCE
-#define VERSION "0.3"
+#define VERSION "0.4"
 #define PATH_LEN	2048
 
 #include <sys/stat.h>
@@ -89,9 +89,12 @@ printStatx(const struct statx *sbx, const char *pathfile, const char *hashfiles)
    if ( (hashfiles == "sha1") && (filetype == "-") && (sbx->stx_size >= 0) ) {
       
       calculate_sha1sum(pathfile);
-      //printf("DEBUG");
    }
 
+   if ( (hashfiles == "sha256") && (filetype == "-") && (sbx->stx_size >= 0) ) {
+      
+      calculate_sha256sum(pathfile);
+   }
 
    printf("%s|%s|%llu|%s%s%s|%d|%d|%llu|%llu.%llu|%llu.%llu|%llu.%llu|%llu.%llu \n", hash,
                                                                                     pathfile,
@@ -148,6 +151,7 @@ static void help(const char *argv0)
    printf("USAGE: %s <-5> <-s> <-v> <-h> [DIRECTORY] \n", argv0);
    printf("\t -5 do MD5 calculation (disabled by default)\n");
    printf("\t -s do SHA1 calculation (disabled by default)\n");
+   printf("\t -S do SHA256 calculation (disabled by default)\n");
    printf("\t -v Show version\n");
    printf("\t -h This help\n");
    exit(EXIT_FAILURE);
@@ -169,7 +173,7 @@ void main(int argc, char *argv[])
    //         return 0;
    //}
 
-   while ((opt = getopt(argc, argv, "vh::5s")) != -1)
+   while ((opt = getopt(argc, argv, "vh::5sS")) != -1)
    {
       switch (opt)
       {
@@ -178,6 +182,9 @@ void main(int argc, char *argv[])
          break;
       case 's':
          hashfiles = "sha1";
+         break;
+      case 'S':
+         hashfiles = "sha256";
          break;
       case 'v':
          printf("macrobber-ng v%s \n", VERSION);
